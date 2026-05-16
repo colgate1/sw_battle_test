@@ -1,48 +1,48 @@
 ﻿#include "Features/BattleSimulation/Processors/Infrastructure/DeathProcessor.hpp"
-#include <vector>
+
 #include "Features/BattleSimulation/Data/BattleActionContext.hpp"
 #include "Features/Units/Infrastructure/IUnit.hpp"
 #include "IO/Events/UnitDied.hpp"
 
+#include <vector>
+
 namespace sw::features
 {
-    DeathProcessor::DeathProcessor(sw::EventLog& eventLog)
-        : _eventLog(eventLog)
-    {
-    }
+	DeathProcessor::DeathProcessor(sw::EventLog& eventLog) :
+			_eventLog(eventLog)
+	{}
 
-    bool DeathProcessor::canProcess(
-        const BattleActionContext& context
-    ) const
-    {
-        return true;
-    }
+	bool DeathProcessor::canProcess(const BattleActionContext& context) const
+	{
+		return true;
+	}
 
-    bool DeathProcessor::process(BattleActionContext& context) const
-    {
-        bool killedAtLeastOne = false;
+	bool DeathProcessor::process(BattleActionContext& context) const
+	{
+		const std::vector<std::uint32_t> aliveUnitIds = context.playfield().getAliveUnitIds();
 
-        const std::vector<std::uint32_t> aliveUnitIds =
-            context.playfield().getAliveUnitIds();
+		bool killedAtLeastOne = false;
 
-        for (std::uint32_t unitId : aliveUnitIds)
-        {
-            IUnit& unit = context.mutablePlayfield().getUnit(unitId);
+		for (std::uint32_t unitId : aliveUnitIds)
+		{
+			if (unitId > context.unitId())
+			{
+				break;
+			}
 
-            if (!unit.shouldDie())
-                continue;
+			IUnit& unit = context.mutablePlayfield().getUnit(unitId);
 
-            unit.markDead();
-            killedAtLeastOne = true;
+			if (!unit.shouldDie())
+			{
+				continue;
+			}
 
-            _eventLog.log(
-                context.tick(),
-                sw::io::UnitDied{
-                    unitId
-                }
-            );
-        }
+			unit.markDead();
+			killedAtLeastOne = true;
 
-        return killedAtLeastOne;
-    }
+			_eventLog.log(context.tick(), io::UnitDied{unitId});
+		}
+
+		return killedAtLeastOne;
+	}
 }

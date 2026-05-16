@@ -1,103 +1,103 @@
 ﻿#include "Features/BattleSimulation/Infrastructure/BattleSimulation.hpp"
 
-#include <utility>
 #include "Features/Units/Infrastructure/IUnit.hpp"
+
+#include <utility>
 
 namespace sw::features
 {
-    BattleSimulation::BattleSimulation(
-        IPlayfield& playfield,
-        std::vector<std::unique_ptr<IBattleActionProcessor>> turnActiveProcessors,
-        std::vector<std::unique_ptr<IBattleActionProcessor>> turnEndProcessors,
-        std::uint32_t& tick
-    )
-        : _playfield(playfield)
-        , _turnActiveProcessors(std::move(turnActiveProcessors))
-        , _turnEndProcessors(std::move(turnEndProcessors))
-        , _tick(tick)
-    {
-    }
+	BattleSimulation::BattleSimulation(
+		IPlayfield& playfield,
+		std::vector<std::unique_ptr<IBattleActionProcessor>> turnActiveProcessors,
+		std::vector<std::unique_ptr<IBattleActionProcessor>> turnEndProcessors,
+		std::uint32_t& tick) :
+			_playfield(playfield),
+			_turnActiveProcessors(std::move(turnActiveProcessors)),
+			_turnEndProcessors(std::move(turnEndProcessors)),
+			_tick(tick)
+	{}
 
-    void BattleSimulation::process()
-    {
-        while (!endSimulation())
-        {
-            const std::vector<std::uint32_t> aliveUnitIds =
-                _playfield.getAliveUnitIds();
+	void BattleSimulation::process()
+	{
+		while (!endSimulation())
+		{
+			const std::vector<std::uint32_t> aliveUnitIds = _playfield.getAliveUnitIds();
 
-            if (aliveUnitIds.empty())
-                return;
+			if (aliveUnitIds.empty())
+			{
+				return;
+			}
 
-            for (std::uint32_t unitId : aliveUnitIds)
-                processTurn(unitId);
+			for (std::uint32_t unitId : aliveUnitIds)
+			{
+				processTurn(unitId);
+			}
 
-            for (std::uint32_t unitId : aliveUnitIds)
-                processTurnEnd(unitId);
+			for (std::uint32_t unitId : aliveUnitIds)
+			{
+				processTurnEnd(unitId);
+			}
 
-            ++_tick;
-        }
-    }
+			++_tick;
+		}
+	}
 
-    void BattleSimulation::processTurn(std::uint32_t unitId)
-    {
-        IUnit& unit = _playfield.getUnit(unitId);
+	void BattleSimulation::processTurn(std::uint32_t unitId)
+	{
+		IUnit& unit = _playfield.getUnit(unitId);
+		BattleActionContext context{unitId, _playfield, _tick};
 
-        if (unit.isDead())
-            return;
+		for (const auto& processor : _turnActiveProcessors)
+		{
+			if (processor->process(context))
+			{
+				break;
+			}
+		}
 
-        BattleActionContext context{
-            unitId,
-            _playfield,
-            _tick
-        };
+		for (const auto& processor : _turnEndProcessors)
+		{
+			processor->process(context);
+		}
+	}
 
-        for (const auto& processor : _turnActiveProcessors)
-        {
-            if (processor->process(context))
-                break;
-        }
-    }
+	void BattleSimulation::processTurnEnd(std::uint32_t unitId)
+	{
+		IUnit& unit = _playfield.getUnit(unitId);
 
-    void BattleSimulation::processTurnEnd(std::uint32_t unitId)
-    {
-        IUnit& unit = _playfield.getUnit(unitId);
+		if (unit.isDead())
+			return;
 
-        if (unit.isDead())
-            return;
+		BattleActionContext context{
+			unitId,
+			_playfield,
+			_tick
+		};
+		for (const auto& processor : _turnEndProcessors)
+			processor->process(context);
+	}
+	bool BattleSimulation::endSimulation() const
+	{
+		const std::vector<std::uint32_t> aliveUnitIds = _playfield.getAliveUnitIds();
 
-        BattleActionContext context{
-            unitId,
-            _playfield,
-            _tick
-        };
+		if (aliveUnitIds.size() <= 1)
+		{
+			return true;
+		}
 
-        for (const auto& processor : _turnEndProcessors)
-            processor->process(context);
-    }
+		for (std::uint32_t unitId : aliveUnitIds)
+		{
+				BattleActionContext context{unitId, _playfield, _tick};
 
-    bool BattleSimulation::endSimulation() const
-    {
-        const std::vector<std::uint32_t> aliveUnitIds =
-            _playfield.getAliveUnitIds();
+				for (const auto& processor : _turnActiveProcessors)
+				{
+					if (processor->canProcess(context))
+					{
+						return false;
+					}
+				}
+			}
 
-        if (aliveUnitIds.size() <= 1)
-            return true;
-
-        for (std::uint32_t unitId : aliveUnitIds)
-        {
-            BattleActionContext context{
-                unitId,
-                _playfield,
-                _tick
-            };
-
-            for (const auto& processor : _turnActiveProcessors)
-            {
-                if (processor->canProcess(context))
-                    return false;
-            }
-        }
-
-        return true;
-    }
-}
+			return true;
+		}
+	}

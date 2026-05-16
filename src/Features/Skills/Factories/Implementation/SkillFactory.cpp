@@ -17,7 +17,7 @@ namespace sw::features
             .withName("Swordsman Attack")
             .addTargetCondition<TargetAliveCondition>()
             .addTargetCondition<TargetInRangeCondition>(1)
-            .addEffect<DamageEffect>(strength)
+    		.addEffect<DamageEffect>(strength, SkillEffectArea::Target)
             .build();
     }
 
@@ -31,7 +31,7 @@ namespace sw::features
             .addSkillCondition<CasterNotBlockedCondition>()
             .addTargetCondition<TargetAliveCondition>()
             .addTargetCondition<TargetInRangeCondition>(range)
-            .addEffect<DamageEffect>(agility)
+            .addEffect<DamageEffect>(agility, SkillEffectArea::Target)
             .build();
     }
 
@@ -43,7 +43,7 @@ namespace sw::features
             .withName("Shadow Strike")
             .addTargetCondition<TargetAliveCondition>()
             .addTargetCondition<TargetInRangeCondition>(1)
-            .addEffect<DamageEffect>(strength)
+            .addEffect<DamageEffect>(strength, SkillEffectArea::Target)
             .build();
     }
 }

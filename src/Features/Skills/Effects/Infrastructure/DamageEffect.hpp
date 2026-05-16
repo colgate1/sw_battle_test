@@ -1,17 +1,22 @@
 ﻿#pragma once
 
-#include "ISkillEffect.hpp"
+#include <cstdint>
+
+#include "Features/Skills/Effects/Infrastructure/ISkillEffect.hpp"
 
 namespace sw::features
 {
-    class DamageEffect final : public ISkillEffect
-    {
-    public:
-        explicit DamageEffect(std::uint32_t value);
+	class DamageEffect final : public ISkillEffect
+	{
+	public:
+		DamageEffect(
+			std::uint32_t value,
+			SkillEffectArea area
+		);
 
-        void apply(SkillExecutionContext& context) const override;
+		void apply(SkillExecutionContext& context) const override;
 
-    private:
-        std::uint32_t _value;
-    };
+	private:
+		std::uint32_t _value;
+	};
 }

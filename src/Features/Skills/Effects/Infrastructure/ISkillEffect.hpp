@@ -1,14 +1,28 @@
 ﻿#pragma once
 
 #include "Features/Skills/Data/SkillExecutionContext.hpp"
+#include "SkillEffectArea.hpp"
 
 namespace sw::features
 {
-    class ISkillEffect
-    {
-    public:
-        virtual ~ISkillEffect() = default;
+	class ISkillEffect
+	{
+	public:
+		explicit ISkillEffect(SkillEffectArea area)
+			: _area(area)
+		{
+		}
 
-        virtual void apply(SkillExecutionContext& context) const = 0;
-    };
+		virtual ~ISkillEffect() = default;
+
+		SkillEffectArea area() const
+		{
+			return _area;
+		}
+
+		virtual void apply(SkillExecutionContext& context) const = 0;
+
+	private:
+		SkillEffectArea _area;
+	};
 }

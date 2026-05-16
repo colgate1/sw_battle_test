@@ -33,11 +33,6 @@ namespace sw::features
 				processTurn(unitId);
 			}
 
-			for (std::uint32_t unitId : aliveUnitIds)
-			{
-				processTurnEnd(unitId);
-			}
-
 			++_tick;
 		}
 	}
@@ -61,21 +56,6 @@ namespace sw::features
 		}
 	}
 
-	void BattleSimulation::processTurnEnd(std::uint32_t unitId)
-	{
-		IUnit& unit = _playfield.getUnit(unitId);
-
-		if (unit.isDead())
-			return;
-
-		BattleActionContext context{
-			unitId,
-			_playfield,
-			_tick
-		};
-		for (const auto& processor : _turnEndProcessors)
-			processor->process(context);
-	}
 	bool BattleSimulation::endSimulation() const
 	{
 		const std::vector<std::uint32_t> aliveUnitIds = _playfield.getAliveUnitIds();

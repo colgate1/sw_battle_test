@@ -21,7 +21,6 @@ namespace sw::features
 
     private:
         void processTurn(std::uint32_t unitId);
-        void processTurnEnd(std::uint32_t unitId);
 
         bool endSimulation() const;
 

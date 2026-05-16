@@ -14,10 +14,14 @@ namespace sw::features
         _map.emplace(size);
     }
 
-    PlayfieldSize Playfield::getMapSize() const
+	PlayfieldSize Playfield::getMapSize() const
     {
-        ensureMapCreated();
-        return PlayfieldSize(_map->width(), _map->height());
+    	ensureMapCreated();
+
+    	return PlayfieldSize{
+    		_map->width(),
+			_map->height()
+		};
     }
 
     void Playfield::spawnUnit(std::unique_ptr<IUnit> unit)

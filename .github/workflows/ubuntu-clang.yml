@@ -25,4 +25,7 @@ jobs:
             -DCMAKE_BUILD_TYPE=Release
 
       - name: Build
-        run: cmake --build build --config Release
+        run: cmake --build build --config Release --parallel
+
+      - name: Run sample
+        run: ./build/sw_battle_test commands_example.txt

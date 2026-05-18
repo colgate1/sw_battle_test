@@ -14,6 +14,7 @@ namespace sw::features
             IPlayfield& playfield,
             std::vector<std::unique_ptr<IBattleActionProcessor>> turnActiveProcessors,
             std::vector<std::unique_ptr<IBattleActionProcessor>> turnEndProcessors,
+            std::vector<std::unique_ptr<IBattleActionProcessor>> roundCompleteProcessors,
             std::uint32_t& tick
         );
 
@@ -21,6 +22,7 @@ namespace sw::features
 
     private:
         void processTurn(std::uint32_t unitId);
+    	void processRoundComplete(std::uint32_t unitId);
 
         bool endSimulation() const;
 
@@ -29,6 +31,7 @@ namespace sw::features
 
         std::vector<std::unique_ptr<IBattleActionProcessor>> _turnActiveProcessors;
         std::vector<std::unique_ptr<IBattleActionProcessor>> _turnEndProcessors;
+        std::vector<std::unique_ptr<IBattleActionProcessor>> _roundCompleteProcessors;
 
         std::uint32_t& _tick;
     };

@@ -12,10 +12,12 @@ namespace sw::features
 		IPlayfield& playfield,
 		std::vector<std::unique_ptr<IBattleActionProcessor>> turnActiveProcessors,
 		std::vector<std::unique_ptr<IBattleActionProcessor>> turnEndProcessors,
+		std::vector<std::unique_ptr<IBattleActionProcessor>> roundCompleteProcessors,
 		std::uint32_t& tick) :
 			_playfield(playfield),
 			_turnActiveProcessors(std::move(turnActiveProcessors)),
 			_turnEndProcessors(std::move(turnEndProcessors)),
+			_roundCompleteProcessors(std::move(roundCompleteProcessors)),
 			_tick(tick)
 	{}
 
@@ -34,7 +36,10 @@ namespace sw::features
 			{
 				processTurn(unitId);
 			}
-
+			for (std::uint32_t unitId : aliveUnitIds)
+			{
+				processRoundComplete(unitId);
+			}
 			++_tick;
 		}
 	}
@@ -61,6 +66,17 @@ namespace sw::features
 		}
 
 		for (const auto& processor : _turnEndProcessors)
+		{
+			processor->process(context);
+		}
+	}
+
+	void BattleSimulation::processRoundComplete(std::uint32_t unitId)
+	{
+		IUnit& unit = _playfield.getUnit(unitId);
+		BattleActionContext context{unitId, _playfield, _tick};
+
+		for (const auto& processor : _roundCompleteProcessors)
 		{
 			processor->process(context);
 		}

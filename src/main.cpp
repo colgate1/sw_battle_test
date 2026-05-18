@@ -105,15 +105,17 @@ int main(int argc, char **argv) {
     }
     std::vector<std::unique_ptr<features::IBattleActionProcessor> > turnActiveProcessors;
     std::vector<std::unique_ptr<features::IBattleActionProcessor> > turnEndedProcessors;
+    std::vector<std::unique_ptr<features::IBattleActionProcessor> > roundCompleteProcessors;
 
     turnActiveProcessors.push_back(std::make_unique<features::SkillProcessor>(eventLog));
     turnActiveProcessors.push_back(std::make_unique<features::MoveProcessor>(eventLog));
     turnEndedProcessors.push_back(std::make_unique<features::DeathProcessor>(eventLog));
-	turnEndedProcessors.push_back(std::make_unique<features::ActionCompletedResetProcessor >(eventLog));
+	roundCompleteProcessors.push_back(std::make_unique<features::ActionCompletedResetProcessor >(eventLog));
     features::BattleSimulation battleSimulation(
         playfield,
         std::move(turnActiveProcessors),
         std::move(turnEndedProcessors),
+        std::move(roundCompleteProcessors),
         tick
     );
 

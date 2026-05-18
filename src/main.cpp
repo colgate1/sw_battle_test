@@ -1,3 +1,18 @@
+#include "Core/Commands/Helpers/AddCommandCollector.hpp"
+#include "Features/BattleSimulation/Infrastructure/BattleSimulation.hpp"
+#include "Features/BattleSimulation/Processors/Infrastructure/ActionCompletedResetProcessor.hpp"
+#include "Features/BattleSimulation/Processors/Infrastructure/DeathProcessor.hpp"
+#include "Features/BattleSimulation/Processors/Infrastructure/MoveProcessor.hpp"
+#include "Features/BattleSimulation/Processors/Infrastructure/SkillProcessor.hpp"
+#include "Features/Commands/Executors/Infrastructure/CreateMapExecutor.hpp"
+#include "Features/Commands/Executors/Infrastructure/MarchExecutor.hpp"
+#include "Features/Commands/Executors/Infrastructure/SpawnHunterExecutor.hpp"
+#include "Features/Commands/Executors/Infrastructure/SpawnSwordsmanExecutor.hpp"
+#include "Features/Creators/Infrastructure/HunterCreator.hpp"
+#include "Features/Creators/Infrastructure/SwordsmanCreator.hpp"
+#include "Features/Playfield/Infrastructure/Playfield.hpp"
+#include "Features/Skills/Factories/Infrastructure/SkillFactory.hpp"
+
 #include <IO/Commands/CreateMap.hpp>
 #include <IO/Commands/March.hpp>
 #include <IO/Commands/SpawnHunter.hpp>
@@ -6,21 +21,6 @@
 #include <IO/System/EventLog.hpp>
 #include <fstream>
 #include <iostream>
-
-#include "Core/Commands/Helpers/AddCommandCollector.hpp"
-#include "Features/BattleSimulation/Infrastructure/BattleSimulation.hpp"
-#include "Features/BattleSimulation/Processors/Infrastructure/DeathProcessor.hpp"
-#include "Features/BattleSimulation/Processors/Infrastructure/MoveProcessor.hpp"
-#include "Features/BattleSimulation/Processors/Infrastructure/SkillProcessor.hpp"
-#include "Features/Commands/Executors/Infrastructure/MarchExecutor.hpp"
-#include "Features/Skills/Factories/Infrastructure/SkillFactory.hpp"
-
-#include "Features/Commands/Executors/Infrastructure/CreateMapExecutor.hpp"
-#include "Features/Commands/Executors/Infrastructure/SpawnHunterExecutor.hpp"
-#include "Features/Commands/Executors/Infrastructure/SpawnSwordsmanExecutor.hpp"
-#include "Features/Creators/Infrastructure/HunterCreator.hpp"
-#include "Features/Creators/Infrastructure/SwordsmanCreator.hpp"
-#include "Features/Playfield/Infrastructure/Playfield.hpp"
 
 int main(int argc, char **argv) {
     using namespace sw;
@@ -109,6 +109,7 @@ int main(int argc, char **argv) {
     turnActiveProcessors.push_back(std::make_unique<features::SkillProcessor>(eventLog));
     turnActiveProcessors.push_back(std::make_unique<features::MoveProcessor>(eventLog));
     turnEndedProcessors.push_back(std::make_unique<features::DeathProcessor>(eventLog));
+	turnEndedProcessors.push_back(std::make_unique<features::ActionCompletedResetProcessor >(eventLog));
     features::BattleSimulation battleSimulation(
         playfield,
         std::move(turnActiveProcessors),

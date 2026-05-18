@@ -4,9 +4,6 @@
 #include <stdexcept>
 #include <utility>
 
-#include "Core/Components/Accessors/ComponentAccess.hpp"
-#include "Features/Units/Stats/MoveComponent.hpp"
-
 namespace sw::features
 {
     void Playfield::createMap(PlayfieldSize size)
@@ -233,44 +230,5 @@ namespace sw::features
         }
 
         return false;
-    }
-
-    bool Playfield::march(
-        std::uint32_t unitId,
-        std::uint32_t targetX,
-        std::uint32_t targetY
-    )
-    {
-        IUnit& unit = getUnit(unitId);
-
-        if (unit.isDead())
-            return false;
-
-        MoveComponent* move =
-            sw::core::findComponent<MoveComponent>(unit);
-
-        if (move == nullptr)
-            return false;
-
-        if (!move->canMove())
-            return false;
-
-        Position target{
-            targetX,
-            targetY
-        };
-
-        if (!ensureInsideMap(target))
-            return false;
-
-        if (unit.position() == target)
-        {
-            move->clearMarch();
-            return false;
-        }
-
-        move->setMarch(target);
-
-        return true;
     }
 }

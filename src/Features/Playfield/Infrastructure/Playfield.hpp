@@ -33,12 +33,6 @@ namespace sw::features
             Position target
         ) override;
 
-        bool march(
-            std::uint32_t unitId,
-            std::uint32_t targetX,
-            std::uint32_t targetY
-        ) override;
-
     private:
         void ensureMapCreated() const;
 

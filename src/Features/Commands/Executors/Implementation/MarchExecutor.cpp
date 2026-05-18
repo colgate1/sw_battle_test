@@ -1,5 +1,7 @@
 ﻿#include "Features/Commands/Executors/Infrastructure/MarchExecutor.hpp"
 
+#include "Core/Components/Accessors/ComponentAccess.hpp"
+#include "Features/Units/Components/MoveComponent.hpp"
 #include "Features/Units/Infrastructure/IUnit.hpp"
 #include "IO/Events/MarchStarted.hpp"
 
@@ -21,7 +23,7 @@ namespace sw::features
         const IUnit& unit = _playfield.getUnit(command.unitId);
         const Position from = unit.position();
 
-        _playfield.march(
+        march(
             command.unitId,
             command.targetX,
             command.targetY
@@ -37,5 +39,44 @@ namespace sw::features
                 command.targetY
             }
         );
+    }
+
+	bool MarchExecutor::march(
+		std::uint32_t unitId,
+		std::uint32_t targetX,
+		std::uint32_t targetY
+	)
+    {
+    	IUnit& unit = _playfield.getUnit(unitId);
+
+    	if (unit.isDead())
+    		return false;
+
+    	MoveComponent* move =
+			sw::core::findComponent<MoveComponent>(unit);
+
+    	if (move == nullptr)
+    		return false;
+
+    	if (!move->canMove())
+    		return false;
+
+    	Position target{
+    		targetX,
+			targetY
+		};
+
+    	if (!_playfield.ensureInsideMap(target))
+    		return false;
+
+    	if (unit.position() == target)
+    	{
+    		move->clearMarch();
+    		return false;
+    	}
+
+    	move->setMarch(target);
+
+    	return true;
     }
 }

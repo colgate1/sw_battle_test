@@ -1,8 +1,8 @@
 ﻿#pragma once
 
-#include "IDeathCondition.hpp"
 #include "Core/Components/Accessors/ComponentAccess.hpp"
-#include "Features/Units/Stats/HealthComponent.hpp"
+#include "Features/Units/Components/HealthComponent.hpp"
+#include "IDeathCondition.hpp"
 
 namespace sw::features
 {

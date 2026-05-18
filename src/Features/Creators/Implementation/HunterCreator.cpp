@@ -1,11 +1,13 @@
-﻿#include <memory>
-#include <utility>
-#include <vector>
+﻿#include "Features/Creators/Infrastructure/HunterCreator.hpp"
 
-#include "Features/Creators/Infrastructure/HunterCreator.hpp"
+#include "Features/Units/Components/MoveComponent.hpp"
+#include "Features/Units/Conditions/ActionCompletedDeathCondition.hpp"
 #include "Features/Units/Conditions/HpDepletedDeathCondition.hpp"
 #include "Features/Units/Infrastructure/Unit.hpp"
-#include "Features/Units/Stats/MoveComponent.hpp"
+
+#include <memory>
+#include <utility>
+#include <vector>
 
 namespace sw::features
 {
@@ -23,16 +25,20 @@ namespace sw::features
             _skillFactory.createShadowStrike(data.strength)
         );
 
+    	std::vector<std::unique_ptr<IDeathCondition>> deathConditions;
+    	deathConditions.push_back(std::make_unique<HpDepletedDeathCondition>());
+    	deathConditions.push_back(std::make_unique<ActionCompletedDeathCondition>());
         auto unit = std::make_unique<Unit>(
             data.base.unitId,
             data.base.name,
             data.base.position,
             std::move(skills),
-            std::make_unique<HpDepletedDeathCondition>()
+            std::move(deathConditions)
         );
 
         unit->addComponent<HealthComponent>(data.health);
         unit->addComponent<MoveComponent>(1);
+        unit->addComponent<ActionCompletedComponent>();
 
         return unit;
     }

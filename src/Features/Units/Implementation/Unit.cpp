@@ -9,13 +9,13 @@ namespace sw::features
         std::string name,
         Position position,
         std::vector<Skill> skills,
-        std::unique_ptr<IDeathCondition> deathCondition
+        std::vector<std::unique_ptr<IDeathCondition>> deathConditions
     )
         : _id(id)
         , _name(std::move(name))
         , _position(position)
         , _skills(std::move(skills))
-        , _deathCondition(std::move(deathCondition))
+        , _deathConditions(std::move(deathConditions))
     {
     }
 
@@ -49,12 +49,17 @@ namespace sw::features
         _isDead = true;
     }
 
-    bool Unit::shouldDie() const
+	bool Unit::shouldDie() const
     {
-        if (_deathCondition == nullptr)
-            return false;
+    	for (const auto& condition : _deathConditions)
+    	{
+    		if (!condition->isSatisfied(*this))
+    		{
+    			return false;
+    		}
+    	}
 
-        return _deathCondition->isSatisfied(*this);
+    	return true;
     }
 
     const std::vector<Skill>& Unit::skills() const

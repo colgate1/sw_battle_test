@@ -1,10 +1,11 @@
 ﻿#pragma once
 
+#include "IO/System/CommandParser.hpp"
+#include "IO/System/PrintDebug.hpp"
+
 #include <functional>
 #include <utility>
 #include <vector>
-
-#include "IO/System/PrintDebug.hpp"
 
 namespace sw::core
 {

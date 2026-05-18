@@ -3,8 +3,8 @@
 #include "Core/Components/Accessors/ComponentAccess.hpp"
 #include "Core/Math/Position.hpp"
 #include "Features/Playfield/Infrastructure/IPlayfield.hpp"
+#include "Features/Units/Components/MoveComponent.hpp"
 #include "Features/Units/Infrastructure/IUnit.hpp"
-#include "Features/Units/Stats/MoveComponent.hpp"
 #include "IO/Events/UnitMoved.hpp"
 
 namespace

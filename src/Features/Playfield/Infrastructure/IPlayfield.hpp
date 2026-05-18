@@ -25,16 +25,11 @@ namespace sw::features
         virtual bool hasNeighbourUnit(std::uint32_t unitId) const = 0;
 
         virtual std::vector<std::uint32_t> getAliveUnitIds() const = 0;
+    	virtual bool ensureInsideMap(Position position) const = 0;
 
         virtual bool tryMoveUnitTowards(
             std::uint32_t unitId,
             Position target
-        ) = 0;
-
-        virtual bool march(
-            std::uint32_t unitId,
-            std::uint32_t targetX,
-            std::uint32_t targetY
         ) = 0;
     };
 }

@@ -25,11 +25,6 @@ namespace sw::features
 
 		for (std::uint32_t unitId : aliveUnitIds)
 		{
-			if (unitId > context.unitId())
-			{
-				break;
-			}
-
 			IUnit& unit = context.mutablePlayfield().getUnit(unitId);
 
 			if (!unit.shouldDie())

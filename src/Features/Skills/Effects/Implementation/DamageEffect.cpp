@@ -2,8 +2,8 @@
 
 #include "Core/Components/Accessors/ComponentAccess.hpp"
 #include "Features/Skills/Data/SkillExecutionContext.hpp"
+#include "Features/Units/Components/HealthComponent.hpp"
 #include "Features/Units/Infrastructure/IUnit.hpp"
-#include "Features/Units/Stats/HealthComponent.hpp"
 #include "IO/Events/UnitAttacked.hpp"
 
 namespace sw::features

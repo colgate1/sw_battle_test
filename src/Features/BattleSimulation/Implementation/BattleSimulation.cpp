@@ -1,5 +1,7 @@
 ﻿#include "Features/BattleSimulation/Infrastructure/BattleSimulation.hpp"
 
+#include "Core/Components/Accessors/ComponentAccess.hpp"
+#include "Features/Units/Components/ActionCompletedComponent.hpp"
 #include "Features/Units/Infrastructure/IUnit.hpp"
 
 #include <utility>
@@ -46,6 +48,14 @@ namespace sw::features
 		{
 			if (processor->process(context))
 			{
+
+				ActionCompletedComponent* actionCompleted =
+					core::findComponent<ActionCompletedComponent>(unit);
+
+				if (actionCompleted != nullptr)
+				{
+					actionCompleted->markCompleted();
+				}
 				break;
 			}
 		}

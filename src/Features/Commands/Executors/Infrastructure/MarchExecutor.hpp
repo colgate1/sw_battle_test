@@ -20,6 +20,12 @@ namespace sw::features
         void execute(const io::March& command) override;
 
     private:
+    	bool march(
+		std::uint32_t unitId,
+		std::uint32_t targetX,
+		std::uint32_t targetY
+	);
+    private:
         IPlayfield& _playfield;
         EventLog& _eventLog;
         const std::uint32_t& _tick;

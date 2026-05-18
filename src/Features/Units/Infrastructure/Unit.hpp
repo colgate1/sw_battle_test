@@ -24,7 +24,7 @@ namespace sw::features
             std::string name,
             Position position,
             std::vector<Skill> skills,
-            std::unique_ptr<IDeathCondition> deathCondition
+            std::vector<std::unique_ptr<IDeathCondition>> deathConditions
         );
 
         std::uint32_t id() const override;
@@ -75,7 +75,7 @@ namespace sw::features
         bool _isDead = false;
 
         std::vector<Skill> _skills;
-        std::unique_ptr<IDeathCondition> _deathCondition;
+    	std::vector<std::unique_ptr<IDeathCondition>> _deathConditions;
 
         std::unordered_map<
             std::type_index,

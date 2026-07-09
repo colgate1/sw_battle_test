@@ -1,140 +1,202 @@
-# **Цель**
+# Goal
 
-Цель задания — **продемонстрировать навыки проектирования ПО.**
-- Не беспокойтесь о производительности, использовании потоков или подключении библиотек.
-- Мы не ожидаем детерминированного результата работы — это лишь усложнило бы задачу.
-- Время выполнения не ограничено, но предполагается, что работа займёт не более 6–8 часов.
+The goal of this assignment is to demonstrate software design skills.
 
-## **Что мы хотим увидеть:**
+Do not worry about performance, multithreading, or integrating external libraries.
+We do not expect deterministic simulation results, as that would only make the task more complicated.
 
-1. Понятный и аккуратный код с прозрачной логикой работы.
-2. Чёткое разграничение зон ответственности между сущностями проекта.
-3. Расширяемую архитектуру, которая позволяет легко добавлять новые сущности и механики взаимодействия
-   - Представьте, что после вас придут 10 младших разработчиков, которые будут одновременно добавлять новые функции.
-   - Ознакомьтесь с README.MD в директориях Core и Feature — они помогут лучше понять цели задачи.
-4. Заметки в документе KNOWN_ISSUES.md - где вы оставите известные вам недостатки и сомнения по вашему решению, к примеру из-за нехватки времени.
+There is no strict time limit, but the expected completion time is no more than 6–8 hours.
 
-# **Задача**
+What we would like to see:
 
-Создайте пошаговую симуляцию боевых столкновений юнитов на карте для тестирования игровых механик.
+Clear and well-structured code with transparent logic.
 
-На карте размером W×H клеток можно размещать юнитов.
+A clear separation of responsibilities between project entities.
 
-- Юниты различаются по типам, **действиям** и **характеристикам**.
-- Каждому юниту присвоен уникальный идентификатор **Id** (целое число)
-- За один ход каждый юнит может выполнить одно действие.
-  - Юниты совершают действия в порядке их создания.
-- Юнит всегда размещен по каким то координатам на карте.
-- Юнит может занимать клетку, не позволяя другим на нее встать.
-- Большинство юнитов имеет характеристику **HP** (Health Points).
-  - При **HP** ≤ 0 юнит выполняет свои действия в текущем ходу и исчезает перед началом следующего.
-- Часть юнитов обладает способностью перемещения:
-  - Они могут переместиться в любую из восьми прилегающих клеток за ход.
-  - Если цель недостижима за один ход, они продолжают движение к ней в последующих ходах.
-  - Статичные юниты должны оставаться неподвижными при любых условиях.
+An extensible architecture that makes it easy to add new entities and interaction mechanics.
 
-Симуляция заканчивается, когда нет юнитов, способных действовать в следующем ходу, или на карте остается только один юнит.
+Imagine that after you, 10 junior developers will join the project and will be adding new features at the same time.
 
-## Юниты, которых нужно реализовать:
+Please read the README.MD files in the Core and Feature directories. They will help you better understand the goals of the assignment.
 
-### Мечник
-- **Характеристики:** HP, Strength
-- Действия
-  - **Сокрушающий удар:** Бьет одного случайного юнита в соседней клетке, нанося ему **Strength** единиц урона.
-  - Если некого бить, перемещается.
+Please also leave notes in the KNOWN_ISSUES.md document, describing any known shortcomings or doubts about your solution, for example due to lack of time.
 
-### Охотник
-- **Характеристики:** HP, Agility, Strength, Range
-- Действия
-  - **Стремительный выстрел:** Стреляет в случайного юнита на расстоянии от 2 до **Range** клеток, нанося ему **Agility** единиц урона. Может стрелять только если в соседних клетках нет других юнитов.
-  - **Удар из тени:** Если стрелять не может, бьет одного случайного юнита в соседней клетке, нанося ему **Strength** единиц урона.
-  - Если некого бить, перемещается.
+# Task
 
-# Приложение
+Create a turn-based simulation of combat encounters between units on a map for testing game mechanics.
 
-При запуске приложение получает путь к файлу со сценарием симуляции, где описаны **команды** для создания карты и юнитов, а также перемещения юнитов по карте. 
-Приложение должно выводить все происходящие события в **stdout**.
+Units can be placed on a map of size W×H cells.
 
-Так как на карте нет препятствий, сложные алгоритмы поиска пути не требуются.
+Units differ by type, actions, and attributes.
 
-## Команды
+Each unit has a unique identifier, Id, which is an integer.
 
-- `CREATE_MAP W H` — Создает карту размером `W`×`H`. Эта команда начинает любой сценарий.
-- `SPAWN_SWORDSMAN I X Y H S` — Создает мечника с идентификатором `I` в точке `X`,`Y` с характеристиками здоровья `H` и силы `S`.
-- `SPAWN_HUNTER I X Y H A S R` — Создает охотника с идентификатором `I` в точке `X`,`Y` с характеристиками здоровья `H`, ловкости `A`, силы `S` и дальности `R`.
-- `MARCH I X Y` — Приказывает юниту `I` переместиться в точку `X`,`Y`.
+During one turn, each unit may perform one action.
 
-## События
+Units perform their actions in the order in which they were created.
 
-- `MAP_CREATED` — Создание карты.
-- `MARCH_STARTED`, `MARCH_ENDED` — Начало и конец перемещения юнита.
-- `UNIT_SPAWNED`, `UNIT_DIED` — Создание и смерть юнита.
-- `UNIT_MOVED` — Перемещение юнита на клетку.
-- `UNIT_ATTACKED` — Атака одного юнита на другого.
+A unit is always placed at some coordinates on the map.
 
-Код парсера команд и вывода событий в лог уже содержится в проекте. Если необходимо, его можно менять. Формат ввода и вывода менять нельзя.
+A unit may occupy a cell, preventing other units from standing on it.
 
-Пример сценария находится в файле _commands_example.txt_. Пример лога событий находится в файле _main.cpp_.
+Most units have an HP attribute, which stands for Health Points.
 
-# Ограничения
-- Не подключать внешние 3rd-party зависимости, только стандартная библиотека
-- Вы можете поменять проект как угодно для достижения цели, даже не используя предоставленную структуру и код 
-  - это не является ни плюсом ни минусом, мы предоставили структуру и код, желая упростить задачу, сэкономить вам время.
+If a unit’s HP is less than or equal to 0, the unit still performs its actions during the current turn and disappears before the beginning of the next turn.
 
-# Технические требования
+Some units have the ability to move:
 
-- **ОС:** Ubuntu
-- **Компилятор:** clang 15+
-- **Стандарт:** C++17 или новее
-- **Система сборки:** cmake (в проекте должен быть CMakeLists.txt)
-- Задание необходимо опубликовать в любом публичном гит-репозитории (GitHub, Bitbucket и т.д.).
+They can move to any of the eight adjacent cells during one turn.
 
-_В процессе выполнения задания вы можете присылать любые вопросы._
+If the target cannot be reached in one turn, they continue moving toward it during subsequent turns.
 
+Static units must remain stationary under all circumstances.
 
-# Планы на расширения
+The simulation ends when there are no units capable of acting on the next turn, or when only one unit remains on the map.
 
-При проектировании учитывайте планы по добавлению новых юнитов, действий и характеристик. 
+# Units to Implement
 
-Возможность создания таких Юнитов с таким поведением не трогая код в Core является важным критерием.
+## Swordsman
 
-Эту функциональность не нужно реализовывать в коде, это подсказка для расширяемости.
+Attributes: HP, Strength
 
-## Башня
+Actions:
 
-- **Характеристики:** HP, Power
-- Действия
-  - **Прицельный выстрел:** Стреляет в случайного юнита на расстоянии от 2 до 5 клеток, нанося ему **Power** единиц урона.
-  - Не может перемещаться.
+Crushing Blow: attacks one random unit in an adjacent cell, dealing Strength damage.
 
-## Лекарь
+If there is no one to attack, the unit moves.
 
-- **Характеристики:** HP, Spirit
-- Действия
-  - **Малое исцеление:** Восстанавливает **Spirit** единиц здоровья одному случайному юниту в радиусе 2 клеток.
-  - Если некого лечить, перемещается.
+## Hunter
 
-## Ворон
+Attributes: HP, Agility, Strength, Range
 
-- **Характеристики:** HP, Agility
-- **Летающий юнит:**
-    - Не занимает клетку на карте.
-    - Может перемещаться на 2 клетки за ход.
-    - Не может быть атакован ближнем боем.
-    - Может быть атакован в дальнем бою, минимальная и максимальная дистанция атаки "стрелка" на ворона снижена на 1.
-- Действия
-  - **Удар когтем:** Бьет одного случайного юнита в соседних клетках, нанося ему **Agility** единиц урона.
-  - Если некого бить, перемещается.
+Actions:
 
-## Мина
+Quick Shot: shoots one random unit at a distance from 2 to Range cells, dealing Agility damage. The Hunter can shoot only if there are no other units in adjacent cells.
 
-- **Характеристики:** Power
-- Не может быть атакована.
-- Не занимает клетку на карте.
-- Действия
-  - Если в радиусе 2х клеток есть юнит - взрывается в следующем ходу, нанося всем юнитам в радиусе 3х клеток **Power** единиц урона.
-  - После взрыва исчезает.
-  - Не может перемещаться.
+Shadow Strike: if the Hunter cannot shoot, it attacks one random unit in an adjacent cell, dealing Strength damage.
+
+If there is no one to attack, the unit moves.
+
+# Application
+
+When launched, the application receives a path to a simulation scenario file. The file contains commands for creating the map and units, as well as commands for moving units across the map.
+
+The application must output all occurring events to stdout.
+
+Since there are no obstacles on the map, complex pathfinding algorithms are not required.
+
+# Commands
+
+CREATE_MAP W H — Creates a map of size W×H. This command starts every scenario.
+
+SPAWN_SWORDSMAN I X Y H S — Creates a Swordsman with identifier I at position X,Y, with health H and strength S.
+
+SPAWN_HUNTER I X Y H A S R — Creates a Hunter with identifier I at position X,Y, with health H, agility A, strength S, and range R.
+
+MARCH I X Y — Orders unit I to move to position X,Y.
+
+# Events
+
+MAP_CREATED — Map creation.
+
+MARCH_STARTED, MARCH_ENDED — Start and end of a unit’s movement.
+
+UNIT_SPAWNED, UNIT_DIED — Unit creation and death.
+
+UNIT_MOVED — A unit moves to another cell.
+
+UNIT_ATTACKED — One unit attacks another unit.
+
+The command parser and event logging code are already included in the project. You may change them if necessary. The input and output formats must not be changed.
+
+An example scenario can be found in the commands_example.txt file.
+An example event log can be found in the main.cpp file.
+
+# Restrictions
+
+Do not add any external third-party dependencies. Use only the standard library.
+
+You may change the project in any way required to achieve the goal, even if that means not using the provided structure and code.
+
+This is neither a plus nor a minus. We provided the structure and code to simplify the task and save you time.
+
+# Technical Requirements
+
+OS: Ubuntu
+
+Compiler: clang 15+
+
+Standard: C++17 or newer
+
+Build system: CMake. The project must contain a CMakeLists.txt file.
+
+The assignment must be published in any public Git repository, such as GitHub, Bitbucket, and so on.
+
+During the assignment, you may send any questions.
+
+# Planned Extensions
+
+When designing the solution, please take into account the planned addition of new units, actions, and attributes.
+
+The ability to create such units with such behavior without modifying the Core code is an important evaluation criterion.
+
+This functionality does not need to be implemented in code. It is only a hint regarding extensibility.
+
+## Tower
+
+Attributes: HP, Power
+
+Actions:
+
+Aimed Shot: shoots one random unit at a distance from 2 to 5 cells, dealing Power damage.
+
+Cannot move.
+
+## Healer
+
+Attributes: HP, Spirit
+
+Actions:
+
+Minor Heal: restores Spirit health points to one random unit within a radius of 2 cells.
+
+If there is no one to heal, the unit moves.
+
+## Raven
+
+Attributes: HP, Agility
+
+Flying unit:
+
+Does not occupy a cell on the map.
+
+Can move 2 cells per turn.
+
+Cannot be attacked in melee combat.
+
+Can be attacked by ranged combat, but the minimum and maximum attack distance of the shooter against the Raven are reduced by 1.
+
+Actions:
+
+Claw Strike: attacks one random unit in adjacent cells, dealing Agility damage.
+
+If there is no one to attack, the unit moves.
+
+## Mine
+
+Attributes: Power
+
+Cannot be attacked.
+
+Does not occupy a cell on the map.
+
+Actions:
+
+If there is a unit within a radius of 2 cells, the Mine explodes on the next turn, dealing Power damage to all units within a radius of 3 cells.
+
+After exploding, it disappears.
+
+Cannot move.
 
 Result
 

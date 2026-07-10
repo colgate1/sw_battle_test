@@ -11,6 +11,11 @@
 
 namespace sw::features
 {
+    enum class SkillTargetSelection
+    {
+        First,
+        RandomSingle
+    };
 
     class Skill final
     {
@@ -19,12 +24,17 @@ namespace sw::features
             std::string name,
             std::vector<std::unique_ptr<ISkillCondition>> skillConditions,
             std::vector<std::unique_ptr<ITargetCondition>> targetConditions,
-            std::vector<std::unique_ptr<ISkillEffect>> effects
+            std::vector<std::unique_ptr<ISkillEffect>> effects,
+            SkillTargetSelection targetSelection =
+                SkillTargetSelection::First,
+            bool completesWithoutTargets = false
         )
             : _name(std::move(name))
             , _skillConditions(std::move(skillConditions))
             , _targetConditions(std::move(targetConditions))
             , _effects(std::move(effects))
+            , _targetSelection(targetSelection)
+            , _completesWithoutTargets(completesWithoutTargets)
         {
         }
 
@@ -54,11 +64,23 @@ namespace sw::features
             return _effects;
         }
 
+        SkillTargetSelection targetSelection() const
+        {
+            return _targetSelection;
+        }
+
+        bool completesWithoutTargets() const
+        {
+            return _completesWithoutTargets;
+        }
+
     private:
         std::string _name;
 
         std::vector<std::unique_ptr<ISkillCondition>> _skillConditions;
         std::vector<std::unique_ptr<ITargetCondition>> _targetConditions;
         std::vector<std::unique_ptr<ISkillEffect>> _effects;
+        SkillTargetSelection _targetSelection = SkillTargetSelection::First;
+        bool _completesWithoutTargets = false;
     };
 }

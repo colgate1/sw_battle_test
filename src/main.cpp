@@ -7,8 +7,10 @@
 #include "Features/Commands/Executors/Infrastructure/CreateMapExecutor.hpp"
 #include "Features/Commands/Executors/Infrastructure/MarchExecutor.hpp"
 #include "Features/Commands/Executors/Infrastructure/SpawnHunterExecutor.hpp"
+#include "Features/Commands/Executors/Infrastructure/SpawnTowerExecutor.hpp"
 #include "Features/Commands/Executors/Infrastructure/SpawnSwordsmanExecutor.hpp"
 #include "Features/Creators/Infrastructure/HunterCreator.hpp"
+#include "Features/Creators/Infrastructure/TowerCreator.hpp"
 #include "Features/Creators/Infrastructure/SwordsmanCreator.hpp"
 #include "Features/Playfield/Infrastructure/Playfield.hpp"
 #include "Features/Skills/Factories/Infrastructure/SkillFactory.hpp"
@@ -16,6 +18,7 @@
 #include <IO/Commands/CreateMap.hpp>
 #include <IO/Commands/March.hpp>
 #include <IO/Commands/SpawnHunter.hpp>
+#include <IO/Commands/SpawnTower.hpp>
 #include <IO/Commands/SpawnSwordsman.hpp>
 #include <IO/System/CommandParser.hpp>
 #include <IO/System/EventLog.hpp>
@@ -43,6 +46,7 @@ int main(int argc, char **argv) {
 
     features::SwordsmanCreator swordsmanCreator(skillFactory);
     features::HunterCreator hunterCreator(skillFactory);
+    features::TowerCreator towerCreator(skillFactory);
 
     features::CreateMapExecutor createMapExecutor(playfield, eventLog, tick);
 
@@ -56,6 +60,13 @@ int main(int argc, char **argv) {
     features::SpawnHunterExecutor spawnHunterExecutor(
         playfield,
         hunterCreator,
+        eventLog,
+        tick
+    );
+
+    features::SpawnTowerExecutor spawnTowerExecutor(
+        playfield,
+        towerCreator,
         eventLog,
         tick
     );
@@ -85,6 +96,13 @@ int main(int argc, char **argv) {
     addCommandCollector<io::SpawnHunter>(
         parser,
         spawnHunterExecutor,
+        std::cout,
+        deferredCommands
+    );
+
+    addCommandCollector<io::SpawnTower>(
+        parser,
+        spawnTowerExecutor,
         std::cout,
         deferredCommands
     );

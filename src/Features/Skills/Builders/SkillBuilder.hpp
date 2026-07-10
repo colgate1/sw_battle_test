@@ -20,6 +20,18 @@ namespace sw::features
             return *this;
         }
 
+        SkillBuilder& withTargetSelection(SkillTargetSelection targetSelection)
+        {
+            _targetSelection = targetSelection;
+            return *this;
+        }
+
+        SkillBuilder& completesWithoutTargets(bool value = true)
+        {
+            _completesWithoutTargets = value;
+            return *this;
+        }
+
         template <typename TCondition, typename... TArgs>
         SkillBuilder& addSkillCondition(TArgs&&... args)
         {
@@ -77,12 +89,16 @@ namespace sw::features
                 std::move(_name),
                 std::move(_skillConditions),
                 std::move(_targetConditions),
-                std::move(_effects)
+                std::move(_effects),
+                _targetSelection,
+                _completesWithoutTargets
             );
         }
 
     private:
         std::string _name;
+        SkillTargetSelection _targetSelection = SkillTargetSelection::First;
+        bool _completesWithoutTargets = false;
 
         std::vector<std::unique_ptr<ISkillCondition>> _skillConditions;
         std::vector<std::unique_ptr<ITargetCondition>> _targetConditions;

@@ -1,20 +1,62 @@
-﻿#include "Features/BattleSimulation/Processors/Infrastructure/SkillProcessor.hpp"
+#include "Features/BattleSimulation/Processors/Infrastructure/SkillProcessor.hpp"
 
+#include <random>
 #include <utility>
 #include <vector>
 
 #include "Features/BattleSimulation/Data/BattleActionContext.hpp"
 #include "Features/Playfield/Infrastructure/IPlayfield.hpp"
-#include "Features/Skills/Skill.hpp"
 #include "Features/Skills/Data/SkillContext.hpp"
 #include "Features/Skills/Data/SkillExecutionContext.hpp"
 #include "Features/Skills/Effects/Infrastructure/ISkillEffect.hpp"
 #include "Features/Units/Infrastructure/IUnit.hpp"
 
+namespace
+{
+    std::uint32_t selectRandomTarget(
+        std::mt19937& randomEngine,
+        const std::vector<std::uint32_t>& targets
+    )
+    {
+        std::uniform_int_distribution<std::size_t> distribution(
+            0,
+            targets.size() - 1
+        );
+
+        const std::size_t index = distribution(randomEngine);
+        return targets[index];
+    }
+
+    std::vector<std::uint32_t> selectTargets(
+        sw::features::SkillTargetSelection selection,
+        std::mt19937& randomEngine,
+        const std::vector<std::uint32_t>& targets
+    )
+    {
+        if (selection == sw::features::SkillTargetSelection::RandomSingle)
+        {
+            return std::vector<std::uint32_t>{
+                selectRandomTarget(randomEngine, targets)
+            };
+        }
+
+        return targets;
+    }
+}
+
 namespace sw::features
 {
     SkillProcessor::SkillProcessor(EventLog& eventLog)
+        : SkillProcessor(eventLog, std::mt19937{std::random_device{}()})
+    {
+    }
+
+    SkillProcessor::SkillProcessor(
+        EventLog& eventLog,
+        std::mt19937 randomEngine
+    )
         : _eventLog(eventLog)
+        , _randomEngine(std::move(randomEngine))
     {
     }
 
@@ -103,7 +145,9 @@ namespace sw::features
         );
 
         if (targets.empty())
-            return false;
+            return skill.completesWithoutTargets();
+
+        targets = selectTargets(skill.targetSelection(), _randomEngine, targets);
 
         SkillExecutionContext executionContext{
             casterId,

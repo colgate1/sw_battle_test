@@ -1,5 +1,6 @@
-﻿#pragma once
+#pragma once
 
+#include <random>
 #include <vector>
 
 #include "IBattleActionProcessor.hpp"
@@ -15,6 +16,10 @@ namespace sw::features
     {
     public:
         explicit SkillProcessor(sw::EventLog& eventLog);
+        SkillProcessor(
+            sw::EventLog& eventLog,
+            std::mt19937 randomEngine
+        );
 
         bool canProcess(
             const BattleActionContext& context
@@ -25,6 +30,9 @@ namespace sw::features
         ) const override;
 
     private:
+        EventLog& _eventLog;
+        mutable std::mt19937 _randomEngine;
+
         bool canExecute(
             const Skill& skill,
             std::uint32_t casterId,
@@ -57,8 +65,5 @@ namespace sw::features
             const Skill& skill,
             SkillExecutionContext& context
         ) const;
-
-    private:
-        EventLog& _eventLog;
     };
 }

@@ -14,5 +14,7 @@ namespace sw::features
         );
 
         static Skill createShadowStrike(std::uint32_t strength);
+
+        static Skill createTowerAimedShot(std::uint32_t power);
     };
 }
